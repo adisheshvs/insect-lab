@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1110">
+<title>Insect Lab | Nature Meets Robotics</title>
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--bg:#0b1110;--panel:#121b16;--line:#293a2e;--lime:#b9f36b;--muted:#91a199}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#eef5ef}
+header{padding:22px 7%;border-bottom:1px solid #293630;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.logo{font-size:21px;font-weight:bold}.green{color:var(--lime)}
+.eyebrow{color:var(--lime);letter-spacing:3px;font-size:11px}
+.hero{padding:70px 7% 45px;background:radial-gradient(ellipse at top,#263c2b,var(--bg) 70%)}
+h1{font-size:clamp(40px,7vw,76px);margin:22px 0;line-height:1.08}
+.hero p{color:#b6c4ba;max-width:560px;line-height:1.8}
+main{padding:30px 7% 70px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;margin:25px 0}
+input,select{padding:13px;background:#151f19;border:1px solid #344638;color:white;border-radius:6px}
+input{flex:1;min-width:190px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:var(--lime)}
+.card:focus-visible,button:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.art{height:180px;display:grid;place-items:center;overflow:hidden;font-size:65px;background:radial-gradient(circle,#354b36,#17221a)}
+.art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.card:hover .art img{transform:scale(1.04)}
+.details{padding:18px}.category{color:var(--lime);font-size:11px;text-transform:uppercase}
+h3{margin-bottom:7px}.scientific{color:var(--muted);font-size:12px;font-style:italic}
+.concept{font-size:13px;line-height:1.6;color:#c0ccc3}
+.open{color:var(--lime);font-size:11px;margin-top:18px}
+#study{display:none}
+.back,.secondary-button,.study-tab,.part-button,.step-button{background:transparent;color:var(--lime);border:1px solid #526449;padding:11px 14px;cursor:pointer;border-radius:5px}
+.back{margin-bottom:25px}.back:hover,.secondary-button:hover{background:#1b2a1d}
+.study-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:25px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:24px;margin-bottom:15px;min-width:0}
+.model-panel{padding:12px}
+model-viewer{display:block;width:100%;height:min(55vh,500px);min-height:330px;background:radial-gradient(circle,#354b36,#111a14);border-radius:7px;--poster-color:transparent}
+.model-hint{color:var(--lime);text-align:center;font-size:12px;line-height:1.6;margin:12px 8px 4px}
+.model-status{color:#c0ccc3;font-size:12px;line-height:1.6;margin:8px;text-align:center}
+.study-layout p{line-height:1.8;color:#bdc9c0}
+footer{padding:25px 7%;color:var(--muted);border-top:1px solid #293630;font-size:11px}
+.study-tabs{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:18px}
+.study-tab{color:#dce7dd;background:#17231a;font-weight:bold}
+.study-tab[aria-selected="true"]{background:var(--lime);color:#10200f;border-color:var(--lime)}
+.module-panel{display:none}.module-panel.active{display:block}
+.part-buttons,.step-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.part-button,.step-button{color:#eaf2eb;background:#17231a;border-color:#405540}
+.part-button.active,.step-button.active{border-color:var(--lime);color:var(--lime);background:#203020}
+.learning-card,.experiment{background:#0d1510;border:1px solid var(--line);border-radius:8px;padding:18px;margin:12px 0}
+.learning-card h3,.experiment h3{margin-top:0}
+.concept-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.concept-grid .learning-card{margin:0}
+.experiment input[type=range]{width:100%;accent-color:var(--lime)}
+.experiment-value{color:var(--lime);font-weight:bold}
+.robot-visual{background:radial-gradient(circle at center,#203326,#0c1510);border:1px solid #354a38;border-radius:10px;padding:12px;margin:18px 0;overflow:hidden}
+.robot-visual svg{display:block;width:100%;height:auto;max-height:300px}
+.robot-visual .diagram-label{fill:#eef5ef;font-size:11px;font-family:Arial,sans-serif}
+.robot-visual .diagram-small{fill:#b9f36b;font-size:9px;font-family:Arial,sans-serif}
+.robot-visual .diagram-line{stroke:#b9f36b;stroke-width:1.5;fill:none}
+.robot-visual .diagram-part{fill:#a8d6a0;stroke:#e2f5c9;stroke-width:1.5}
+.robot-visual .diagram-dark{fill:#17251b;stroke:#b9f36b;stroke-width:1.5}
+.robot-caption{color:#bdc9c0;font-size:13px;line-height:1.7;margin:10px 4px 4px}
+
+.resource-list{display:grid;gap:9px;margin-top:14px}
+.resource-link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;background:#121d15;border:1px solid #344638;border-radius:6px;color:#dce7dd;text-decoration:none;font-size:13px;line-height:1.5;transition:border-color .2s,background .2s}
+.resource-link:hover{border-color:var(--lime);background:#19271b}
+.resource-link span{color:var(--lime);font-size:11px;white-space:nowrap}
+.resource-note{font-size:12px;color:var(--muted);line-height:1.6;margin:10px 0 0}
+
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.study-layout{grid-template-columns:1fr}}
+@media(max-width:500px){.grid,.concept-grid{grid-template-columns:1fr}.hero{padding-top:45px}header{flex-wrap:wrap}main{padding-left:5%;padding-right:5%}.study-tab{flex:1 1 40%}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">INSECT<span class="green">LAB.</span></div>
+  <span class="eyebrow">BIOLOGY × ROBOTICS</span>
+</header>
+
+<section class="hero" id="hero">
+  <div class="eyebrow">THE BIOMECHANICS COLLECTION</div>
+  <h1>Nature is the<br><span class="green">original engineer.</span></h1>
+  <p>Explore how insects fly, jump, walk and grasp. Discover the physics behind their movements and how their mechanisms inspire robotics.</p>
+</section>
+
+<main>
+<section id="library">
+  <h2>Explore the insects<span class="green">.</span></h2>
+  <p style="color:#91a199">10 specimens · Physics · Mechanics · Robotics</p>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search insects or concepts..." aria-label="Search insects">
+    <select id="filter" aria-label="Filter by category">
+      <option value="All">All categories</option>
+      <option value="Flight">Flight</option>
+      <option value="Locomotion">Locomotion</option>
+      <option value="Mechanisms">Mechanisms</option>
+    </select>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section id="study">
+  <button class="back" id="back" type="button">← Back to all insects</button>
+  <div class="eyebrow" id="category"></div>
+  <h1 id="name"></h1>
+  <p class="scientific" id="scientific"></p>
+
+  <div class="study-layout">
+    <div>
+      <div class="panel model-panel">
+        <model-viewer id="insect3D" alt="Interactive 3D insect model" camera-controls auto-rotate rotation-per-second="18deg" shadow-intensity="1" exposure="1" interaction-prompt="auto" loading="eager"></model-viewer>
+        <p class="model-hint">🖱️ Drag to rotate · Scroll to zoom</p>
+        <p class="model-status" id="modelStatus" role="status">Choose an insect to load its 3D model.</p>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">MODEL CONTROLS</div>
+        <p class="muted">Drag to rotate the 3D model and scroll to zoom.</p>
+        <button class="secondary-button" id="resetView" type="button">Reset model view</button>
+      </div>
+    </div>
+
+    <div class="study-modules">
+      <div class="study-tabs" role="tablist" aria-label="Study topics">
+        <button class="study-tab" role="tab" aria-selected="true" data-tab="anatomy">01 Anatomy</button>
+        <button class="study-tab" role="tab" aria-selected="false" data-tab="physics">02 Physics</button>
+        <button class="study-tab" role="tab" aria-selected="false" data-tab="mechanics">03 Mechanics</button>
+        <button class="study-tab" role="tab" aria-selected="false" data-tab="robotics">04 Robotics</button>
+      </div>
+
+      <section class="panel module-panel active" id="panel-anatomy">
+        <div class="eyebrow">ANATOMY EXPLORER</div>
+        <h2>Explore the body</h2>
+        <p class="muted">Select a body part to learn its function. These controls explain the parts; they do not automatically highlight parts on the 3D model.</p>
+        <div class="part-buttons" id="partButtons"></div>
+        <div class="learning-card">
+          <div class="eyebrow" id="partType">BODY PART</div>
+          <h3 id="partName">Choose a body part</h3>
+          <p id="partDescription" class="muted"></p>
+        </div>
+        <div class="learning-card">
+          <h3>Body overview</h3>
+          <p id="anatomyOverview" class="muted"></p>
+        </div>
+        <div class="learning-card">
+          <div class="eyebrow">FREE LEARNING RESOURCES</div>
+          <h3>Explore anatomy sources</h3>
+          <div class="resource-list" id="resources-anatomy"></div>
+          <p class="resource-note">Links open free educational material or search results. Check each page for species-specific detail.</p>
+        </div>
+      </section>
+
+      <section class="panel module-panel" id="panel-physics">
+        <div class="eyebrow">PHYSICS LAB</div>
+        <h2>The science of movement</h2>
+        <p id="physicsOverview" class="muted"></p>
+        <div class="concept-grid">
+          <div class="learning-card"><div class="eyebrow">KEY IDEA</div><h3 id="physicsKey"></h3><p id="physicsExplain" class="muted"></p></div>
+          <div class="learning-card"><div class="eyebrow">OBSERVE</div><h3>Look at the model</h3><p id="physicsObserve" class="muted"></p></div>
+        </div>
+        <div class="experiment">
+          <h3>Try a thought experiment</h3>
+          <p id="experimentPrompt" class="muted"></p>
+          <label for="physicsSlider" id="physicsSliderLabel">Change the setting</label>
+          <input id="physicsSlider" type="range" min="1" max="10" value="5">
+          <p>Setting: <span class="experiment-value" id="physicsValue">5 / 10</span></p>
+          <p id="experimentResult" class="muted" aria-live="polite"></p>
+          <p class="muted">Conceptual learning aid, not a measured physics simulation.</p>
+        </div>
+        <div class="learning-card">
+          <div class="eyebrow">FREE LEARNING RESOURCES</div>
+          <h3>Explore physics sources</h3>
+          <div class="resource-list" id="resources-physics"></div>
+          <p class="resource-note">Search results can vary; use the species name and topic to find relevant papers.</p>
+        </div>
+      </section>
+
+      <section class="panel module-panel" id="panel-mechanics">
+        <div class="eyebrow">MECHANICS EXPLORER</div>
+        <h2>How the body moves</h2>
+        <p id="mechanicsOverview" class="muted"></p>
+        <div class="step-buttons" id="stepButtons"></div>
+        <div class="learning-card">
+          <div class="eyebrow" id="stepCounter">MOVEMENT STEP</div>
+          <h3 id="stepName"></h3>
+          <p id="stepDescription" class="muted"></p>
+        </div>
+        <div class="learning-card">
+          <div class="eyebrow">FREE LEARNING RESOURCES</div>
+          <h3>Explore mechanics sources</h3>
+          <div class="resource-list" id="resources-mechanics"></div>
+          <p class="resource-note">These searches focus on movement, joints, locomotion and biomechanics.</p>
+        </div>
+      </section>
+
+      <section class="panel module-panel" id="panel-robotics">
+        <div class="eyebrow">BIOMIMETIC ROBOTICS</div>
+        <h2>From insect to robot</h2>
+        <p id="roboticsOverview" class="muted"></p>
+        <h3>See how the mechanism works</h3>
+        <div class="robot-visual" id="robotVisual"></div>
+        <p class="robot-caption" id="robotVisualCaption"></p>
+        <div class="concept-grid">
+          <div class="learning-card">
+            <div class="eyebrow">ROBOTIC IDEA</div>
+            <h3 id="robotIdea"></h3>
+            <p id="robotIdeaDescription" class="muted"></p>
+          </div>
+          <div class="learning-card">
+            <div class="eyebrow">ENGINEERING CHALLENGE</div>
+            <h3>What engineers must solve</h3>
+            <p id="robotChallenge" class="muted"></p>
+          </div>
+        </div>
+        <div class="learning-card">
+          <div class="eyebrow">FREE LEARNING RESOURCES</div>
+          <h3>Explore bio-inspired robotics</h3>
+          <div class="resource-list" id="resources-robotics"></div>
+          <p class="resource-note">Research links are searches, not endorsements; review each paper's abstract and publication details.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>INSECT LAB · LEARN FROM NATURE. BUILD FOR THE FUTURE.</footer>
+
+<script>
+const insects = [
+{id:'dragonfly',name:'Dragonfly',scientific:'Anisoptera',category:'Flight',emoji:'🪰',image:'images/dragongfly.jpg',model:'models/dragonfly.glb',concept:'Flight stability and four-wing control',anatomy:'Head, thorax, abdomen, compound eyes and four wings.',physics:'Lift, drag, angular motion and aerodynamic stability.',mechanics:'Four wings produce coordinated and adjustable movements.',robotics:'Inspiration for agile aerial robots and flight-control systems.'},
+{id:'bee',name:'Honey Bee',scientific:'Apis mellifera',category:'Flight',emoji:'🐝',image:'images/honeybee.jpg',model:'models/the_honeybee.glb',concept:'Flapping-wing aerodynamics',anatomy:'Head, thorax, abdomen, antennae, six legs and two pairs of wings.',physics:'Unsteady airflow, lift, drag and oscillatory motion.',mechanics:'Flight muscles drive repeated wing strokes.',robotics:'Inspiration for flapping-wing micro air vehicles.'},
+{id:'fly',name:'Housefly',scientific:'Musca domestica',category:'Flight',emoji:'🪰',image:'images/housefly.jpg',model:'models/housefly.glb',concept:'Fast manoeuvres and stabilisation',anatomy:'Head, thorax, abdomen, wings, legs and halteres.',physics:'Aerodynamic forces, angular motion and inertial sensing.',mechanics:'A pair of wings and halteres support flight.',robotics:'Inspiration for fast-response flight stabilisation.'},
+{id:'grasshopper',name:'Grasshopper',scientific:'Caelifera',category:'Locomotion',emoji:'🦗',image:'images/grasshopper.jpg',model:'models/grasshopper.glb',concept:'Jumping and stored energy',anatomy:'Head, thorax, abdomen and enlarged hind legs.',physics:'Impulse, projectile motion and elastic potential energy.',mechanics:'Powerful hind legs generate rapid take-off.',robotics:'Inspiration for spring-loaded jumping robots.'},
+{id:'ant',name:'Ant',scientific:'Formicidae',category:'Locomotion',emoji:'🐜',image:'images/ant.jpg',model:'models/ant.glb',concept:'Legged movement and teamwork',anatomy:'Head, antennae, thorax, petiole, abdomen and six legs.',physics:'Friction, ground reaction forces and load distribution.',mechanics:'Six articulated legs coordinate during walking.',robotics:'Inspiration for legged robots and swarm robotics.'},
+{id:'butterfly',name:'Butterfly',scientific:'Lepidoptera',category:'Flight',emoji:'🦋',image:'images/butterfly.jpg',model:'models/butterfly.glb',concept:'Wing movement and gliding',anatomy:'Head, thorax, abdomen, antennae and scaled wings.',physics:'Aerodynamic forces, oscillation and energy transfer.',mechanics:'Two pairs of wings move through repeated strokes.',robotics:'Inspiration for lightweight biomimetic wings.'},
+{id:'mosquito',name:'Mosquito',scientific:'Culicidae',category:'Flight',emoji:'🦟',image:'images/maskito.jpg',model:'models/mosquito_vfx.glb',concept:'Oscillating wings',anatomy:'Head, proboscis, thorax, abdomen, wings and long legs.',physics:'Small-scale fluid dynamics and periodic motion.',mechanics:'Flight muscles drive rapid wing oscillations.',robotics:'Inspiration for miniature flying systems.'},
+{id:'beetle',name:'Beetle',scientific:'Coleoptera',category:'Mechanisms',emoji:'🪲',image:'images/beetel.jpg',model:'models/rhinoceros_beetle.glb',concept:'Protection and deployment',anatomy:'Head, thorax, abdomen, hardened forewings and six legs.',physics:'Structural strength, deformation and energy transfer.',mechanics:'Hardened forewings protect folded hindwings.',robotics:'Inspiration for protective shells and deployable structures.'},
+{id:'cockroach',name:'Cockroach',scientific:'Blattodea',category:'Locomotion',emoji:'🪳',image:'images/cockroch.jpg',model:'models/giant_cockroach.glb',concept:'Movement over rough terrain',anatomy:'Head, antennae, thorax, abdomen and six legs.',physics:'Friction, impact, torque and terrain interaction.',mechanics:'Articulated legs help navigate uneven surfaces.',robotics:'Inspiration for rough-terrain search-and-rescue robots.'},
+{id:'mantis',name:'Praying Mantis',scientific:'Mantodea',category:'Mechanisms',emoji:'🦗',image:'images/praying%20manties.jpg',model:'models/praying_mantis.glb',concept:'Grasping and joint mechanics',anatomy:'Triangular head, elongated thorax and specialised forelegs.',physics:'Torque, lever arms, force and rotational motion.',mechanics:'Spined forelegs fold to capture and hold prey.',robotics:'Inspiration for robotic grippers and manipulators.'}
+];
+
+const lessons = {
+dragonfly:{
+parts:[['Head','Contains large compound eyes and antennae. The eyes provide a broad field of view for detecting movement.'],['Thorax','The middle body region where wings and three pairs of legs attach. Flight muscles are concentrated here.'],['Abdomen','The long segmented rear body contributes to balance and body orientation.'],['Compound eyes','Many small visual units help detect motion and provide a wide field of view.'],['Forewings','The front pair can adjust its stroke to help control flight.'],['Hindwings','The rear pair adds aerodynamic force and control.'],['Legs','The legs can form a basket-like shape to catch prey while flying.']],
+key:'Lift, drag and stability',explain:'Wings moving through air experience aerodynamic forces. Wing angle, speed and stroke timing affect those forces.',observe:'Look at all four wings and consider how different timing could change turning and stability.',prompt:'Imagine increasing the strength of a wing stroke.',label:'Imagined wing-stroke strength',result:v=>v<4?'A weaker stroke generally produces less aerodynamic force.':v<8?'A moderate stroke may provide useful lift and control.':'A stronger stroke may increase force but can also require more energy.',mechanics:'Dragonflies can change the timing and amplitude of their four wings to control movement.',steps:[['Prepare','The thorax and flight muscles position the wings.'],['Stroke','The wings move through air and generate aerodynamic forces.'],['Adjust','Changing stroke timing changes forces and body rotation.'],['Stabilise','Sensory feedback helps correct the flight path.']],idea:'Four-wing control',ideaText:'A robot could use independently controlled wings or rotors to change lift and turning moments.',challenge:'Engineers must coordinate actuators, sensors, weight and power to keep the robot stable.'
+},
+bee:{
+parts:[['Head','Contains eyes, antennae and mouthparts used to sense the environment and collect food.'],['Antennae','Provide sensory information, including odours and touch.'],['Thorax','Supports wings and legs and contains the main flight muscles.'],['Abdomen','Contains internal organs; worker bees also have wax glands and a sting apparatus.'],['Forewings','The front wings generate aerodynamic forces during flight.'],['Hindwings','Small hooks couple the hindwings to the forewings during flight.'],['Legs','Used for walking and handling pollen.']],
+key:'Unsteady aerodynamics',explain:'Flapping wings move through changing airflow. Lift depends on wing motion, angle, speed and interactions with air vortices.',observe:'Notice the wing attachment on the thorax and consider how repeated strokes support a loaded body.',prompt:'Imagine increasing wing-stroke effort.',label:'Imagined stroke effort',result:v=>v<4?'Lower effort may mean less lift available for carrying a load.':v<8?'Moderate effort may balance lift and energy use.':'Greater effort can create stronger motion but generally costs more energy.',mechanics:'Flight muscles deform the thorax and drive repeated wing strokes. Hooks couple the forewing and hindwing.',steps:[['Muscle action','Flight muscles deform the thorax.'],['Wing stroke','Coupled wings move through the air.'],['Control','Small changes in wing motion help adjust direction.'],['Carry load','The bee balances its weight and carried material.']],idea:'Flapping-wing robot',ideaText:'A lightweight mechanism could convert motor motion into repeated wing strokes.',challenge:'Miniaturising motors, batteries, controls and durable wings is difficult.'
+},
+fly:{
+parts:[['Head','Contains compound eyes, antennae and mouthparts. The eyes help detect rapid visual changes.'],['Thorax','Supports wings and legs and houses flight muscles.'],['Abdomen','A segmented region containing digestive and reproductive organs.'],['Wings','The single functional pair of wings generates flight forces.'],['Halteres','Small organs derived from hindwings that help sense body rotation.'],['Legs','Used for walking, gripping surfaces and sensing contact.'],['Compound eyes','Wide-field visual organs that help detect movement.']],
+key:'Angular motion and sensing',explain:'A flying body can rotate around its axes. Sensing rotation helps a fly make corrections to its flight path.',observe:'The halteres are tiny, but their movement provides information about body rotation.',prompt:'Imagine the fly experiences a larger rotation disturbance.',label:'Imagined rotation disturbance',result:v=>v<4?'A small disturbance may need only a small correction.':v<8?'A larger disturbance calls for faster sensory feedback and carefully timed wing adjustments.':'A very large disturbance can be harder to correct.',mechanics:'One pair of wings provides flight. The halteres oscillate with the wingbeat and help detect body rotation.',steps:[['Detect','Halteres respond to body rotation.'],['Signal','Sensory information reaches the nervous system.'],['Correct','The fly adjusts wing motion and orientation.'],['Recover','Feedback helps bring the flight path under control.']],idea:'Tiny inertial sensor',ideaText:'A robot can use an inertial measurement unit to estimate rotation and stabilise flight.',challenge:'Sensors and control loops must respond quickly while remaining light and energy efficient.'
+},
+grasshopper:{
+parts:[['Head','Carries the eyes, antennae and mouthparts.'],['Thorax','Three thoracic segments support the legs and wings.'],['Abdomen','A segmented region containing organs and contributing to body balance.'],['Hind legs','Large muscular legs generate the push needed for jumping.'],['Femur','The enlarged upper hind-leg segment houses powerful muscles.'],['Tibia','The lower hind-leg segment extends during take-off and helps apply force to the ground.'],['Joints','Allow leg segments to rotate and transfer muscle force into movement.']],
+key:'Impulse and stored energy',explain:'A jump changes momentum. Impulse depends on force and the time over which it acts; elastic energy can help deliver rapid take-off.',observe:'The enlarged hind legs are specialised for powerful jumping.',prompt:'Imagine increasing the effective push from the hind legs.',label:'Imagined take-off push',result:v=>v<4?'A smaller push generally produces a smaller change in momentum.':v<8?'A stronger push can increase take-off speed if the legs transmit force without slipping.':'A strong push could create a larger jump, but mass, leg geometry and ground contact also matter.',mechanics:'The hind legs flex to prepare, then extend rapidly. Joint geometry and muscle action help create a powerful push.',steps:[['Crouch','The hind legs flex and prepare for take-off.'],['Load','Muscles and elastic structures store or transmit energy.'],['Push off','The hind legs extend and apply force against the ground.'],['Flight','The insect follows a projectile-like path until landing.']],idea:'Spring-loaded leg',ideaText:'A robot can store energy in a spring and release it quickly to create a jump.',challenge:'A jumping robot must land safely, recover balance and reset its mechanism.'
+},
+ant:{
+parts:[['Head','Contains eyes, antennae and mandibles used to handle food and objects.'],['Antennae','Sense chemicals, touch and information from other ants.'],['Thorax / mesosoma','Supports the three pairs of legs.'],['Petiole','The narrow waist segment connecting the middle body to the abdomen.'],['Abdomen','Contains internal organs and, in some species, defensive structures.'],['Six legs','Support the body and create coordinated walking patterns.'],['Mandibles','Jaw-like structures used for cutting, carrying, digging or gripping.']],
+key:'Friction and ground reaction',explain:'Walking requires feet to push against the ground. Ground reaction forces and friction support the body and move it forward.',observe:'Several legs can remain in contact with the ground while others swing forward.',prompt:'Imagine the walking surface becomes more slippery.',label:'Imagined ground grip',result:v=>v<4?'Low grip makes it harder to transmit a forward push; feet may slip.':v<8?'Moderate grip can provide useful traction for walking and carrying.':'High grip can help prevent slipping, although texture, posture and load also matter.',mechanics:'Ants coordinate six articulated legs. Gait patterns can keep several legs in contact while others move.',steps:[['Support','Some legs support the body and provide traction.'],['Swing','Other legs lift and move to new footholds.'],['Transfer','The body shifts forward as forces pass between legs.'],['Repeat','Coordinated leg cycles continue walking.']],idea:'Six-legged walking robot',ideaText:'Multiple legs can help a robot maintain support while stepping over uneven surfaces.',challenge:'The robot needs reliable foot placement, balance, sensing and joint coordination.'
+},
+butterfly:{
+parts:[['Head','Contains compound eyes, antennae and a coiled proboscis used to drink nectar.'],['Thorax','Supports two pairs of wings and three pairs of legs; flight muscles are located here.'],['Abdomen','Contains digestive and reproductive organs and has flexible segments.'],['Forewings','The front pair contributes to lift, steering and the wingbeat.'],['Hindwings','The rear pair works with the forewings during flapping and manoeuvring.'],['Antennae','Help sense the environment and provide information important for orientation.'],['Legs','Used for landing, holding surfaces and sensing contact.']],
+key:'Lift, drag and oscillation',explain:'Butterfly wings move through air in repeated strokes. Changing wing angle and speed affects lift, drag and flight path.',observe:'Broad wings interact with air, but appearance alone does not reveal the exact force produced.',prompt:'Imagine increasing the speed of a wing stroke.',label:'Imagined wing-stroke speed',result:v=>v<4?'A slower stroke may produce less aerodynamic force, depending on wing angle and airflow.':v<8?'A moderate stroke may balance force and energy use.':'A faster stroke changes aerodynamic forces and may require more energy.',mechanics:'Muscles in the thorax drive the forewings and hindwings through repeated strokes.',steps:[['Prepare','The wings move into position for the next stroke.'],['Downstroke','The wings sweep through air and generate forces.'],['Upstroke','The wings return for the next cycle.'],['Steer','Changes in wing motion and posture help guide flight.']],idea:'Flexible wing structure',ideaText:'A robot wing can use a lightweight frame and flexible membrane to reduce mass.',challenge:'Engineers must balance wing flexibility, durability, control and efficient power use.'
+},
+mosquito:{
+parts:[['Head','Holds the eyes, antennae and mouthparts.'],['Proboscis','A long mouthpart used for feeding; its structure differs between sexes and species.'],['Thorax','Supports wings and legs and contains flight muscles.'],['Abdomen','A segmented region that can expand after feeding and contains internal organs.'],['Wings','A single pair of wings generates aerodynamic forces during flight.'],['Halteres','Modified hindwings that help sense body movement.'],['Long legs','Help the mosquito land and rest on surfaces.']],
+key:'Oscillation and small-scale airflow',explain:'Mosquito wings beat rapidly. Wing motion and airflow are important for generating enough force at a small scale.',observe:'The wings are small relative to the body, so rapid movement is important for flight.',prompt:'Imagine changing wingbeat frequency.',label:'Imagined wingbeat frequency',result:v=>v<4?'A lower frequency could reduce available force, depending on wing amplitude and speed.':v<8?'A suitable frequency and stroke amplitude can support flight under the right conditions.':'Higher frequency does not automatically mean better flight; energy use and wing motion also matter.',mechanics:'Flight muscles drive rapid wing oscillations. Halteres provide sensory feedback about body motion.',steps:[['Oscillate','Flight muscles drive repeated wing movement.'],['Generate force','Moving wings interact with the air.'],['Sense motion','Halteres help detect rotations and disturbances.'],['Correct','Wing adjustments help maintain the flight path.']],idea:'Micro flying robot',ideaText:'A miniature robot could combine small actuators, lightweight wings and motion sensors.',challenge:'Limited battery capacity and tiny actuators make stable flight difficult.'
+},
+beetle:{
+parts:[['Head','Contains the eyes, antennae and mouthparts.'],['Thorax','Supports the legs and wing structures.'],['Abdomen','Contains internal organs and is protected by hardened forewings in many beetles.'],['Elytra','Hardened forewings that protect the hindwings and abdomen.'],['Hindwings','In many flying beetles, membranous wings fold beneath the elytra.'],['Legs','Three pairs of legs provide walking, gripping, digging or other specialised movement.'],['Antennae','Sensory structures that help detect chemical and physical information.']],
+key:'Strength and structural protection',explain:'A protective shell distributes contact forces and shields delicate structures. Shape, material and thickness affect strength and mass.',observe:'Compare the hardened outer wings with the thinner flight wings underneath.',prompt:'Imagine increasing the thickness of a protective shell.',label:'Imagined shell thickness',result:v=>v<4?'A thinner shell may reduce mass but provide less protection.':v<8?'A moderate shell can balance protection and weight.':'A thicker shell may resist some impacts better but adds mass and can affect movement.',mechanics:'In many flying beetles, the elytra open to allow the hindwings to deploy, then close over them for protection.',steps:[['Protected','The elytra cover and protect the hindwings.'],['Open','The protective forewings move aside.'],['Deploy','The hindwings unfold into a flight-ready shape.'],['Fold and cover','After flight, the hindwings fold beneath the elytra.']],idea:'Deployable protective cover',ideaText:'A robot could use a hard outer shell to protect delicate components and open when needed.',challenge:'The design must be protective but lightweight and deploy reliably.'
+},
+cockroach:{
+parts:[['Head','Contains antennae, eyes and mouthparts.'],['Antennae','Long sensory organs that help detect obstacles and environmental cues.'],['Thorax','Supports three pairs of legs and, in winged species, wings.'],['Abdomen','A segmented rear body with flexible plates and sensory structures.'],['Legs','Six articulated legs provide rapid walking over uneven terrain.'],['Joints','Allow leg segments to swing and redirect forces during movement.'],['Cerci','Paired appendages at the rear that can detect air movement and nearby disturbances.']],
+key:'Impact, friction and terrain',explain:'Rough-terrain movement involves ground reaction forces, friction, impacts and body stability.',observe:'A low body and multiple legs can help the cockroach keep moving after encountering an obstacle.',prompt:'Imagine the ground becomes more uneven.',label:'Imagined terrain difficulty',result:v=>v<4?'Smooth ground generally requires fewer adjustments to foot placement.':v<8?'Moderately uneven ground requires changes in leg motion and posture.':'Very rough terrain makes contact and balance harder; speed and leg geometry also matter.',mechanics:'Alternating leg movements, articulated joints and sensory responses help the cockroach move over obstacles.',steps:[['Sense','Antennae and other organs detect nearby disturbances.'],['Place foot','A leg reaches a suitable contact point.'],['Push and transfer','The leg pushes against the ground as the body moves.'],['Recover','Other legs and posture help maintain balance.']],idea:'Rugged multi-legged robot',ideaText:'Articulated legs and a compact body can help a robot cross uneven ground.',challenge:'It must maintain traction, avoid getting stuck, sense obstacles and survive impacts.'
+},
+mantis:{
+parts:[['Head','The triangular head carries large compound eyes and can turn toward a target.'],['Thorax','The elongated middle body supports walking legs and specialised front legs.'],['Abdomen','A segmented region containing internal organs and contributing to balance.'],['Raptorial forelegs','Specialised front legs fold to seize and hold prey.'],['Spines','Structures on the forelegs help grip and secure prey.'],['Middle and hind legs','Primarily support walking and body positioning.'],['Compound eyes','Help detect visual targets and estimate their position.']],
+key:'Torque and lever arms',explain:'Torque produces rotational motion and depends on applied force and its distance from the joint axis.',observe:'Look at the folded forelegs and consider how changing joint angle moves the gripping surfaces.',prompt:'Imagine increasing the force applied by a gripper.',label:'Imagined gripping force',result:v=>v<4?'A low gripping force may not hold an object securely.':v<8?'A suitable force can hold an object while limiting unnecessary pressure.':'Excessive force can waste energy or damage delicate objects; geometry and friction also matter.',mechanics:'Specialised forelegs fold and extend through joints. Spines and leg shape help trap and hold prey.',steps:[['Track','The head and eyes orient toward a target.'],['Prepare','The forelegs fold into a ready position.'],['Strike and close','The forelegs extend and close around the target.'],['Hold','Spined surfaces help maintain a grip.']],idea:'Fast articulated gripper',ideaText:'Linked joints and shaped gripping surfaces can help a robot catch or hold objects.',challenge:'A gripper must balance speed, accuracy, holding force and safe contact.'
+}
+};
+
+const diagrams = {
+dragonfly:{
+caption:'Four independently controlled wings can inspire agile flying robots. Changing wing motion can help control direction and stability.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Dragonfly inspired flying robot diagram">
+<text x="12" y="20" class="diagram-small">BIOMIMETIC FLIGHT ROBOT</text>
+<ellipse cx="170" cy="105" rx="17" ry="12" class="diagram-part"/>
+<rect x="165" y="116" width="10" height="48" rx="5" class="diagram-dark"/>
+<circle cx="170" cy="87" r="11" class="diagram-part"/>
+<path d="M164 80 Q150 60 142 64 M176 80 Q190 60 198 64" class="diagram-line"/>
+<path d="M157 98 Q112 40 78 66 Q110 91 157 105 Z" class="diagram-dark"/>
+<path d="M183 98 Q228 40 262 66 Q230 91 183 105 Z" class="diagram-dark"/>
+<path d="M157 108 Q110 112 92 150 Q128 148 162 117 Z" class="diagram-part"/>
+<path d="M183 108 Q230 112 248 150 Q212 148 178 117 Z" class="diagram-part"/>
+<path d="M163 128 L137 151 M177 128 L203 151 M165 140 L151 169 M175 140 L189 169" class="diagram-line"/>
+<path d="M84 44 L110 66 M220 177 L194 150" class="diagram-line"/>
+<text x="12" y="40" class="diagram-label">Wing actuation</text>
+<text x="218" y="190" class="diagram-label">Control</text>
+<text x="12" y="207" class="diagram-small">WINGS + ACTUATORS + FLIGHT CONTROL</text></svg>`
+},
+bee:{
+caption:'A motor or linkage can flap lightweight wings. Engineers balance wing movement, lift, battery weight and energy use.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Flapping wing robot diagram">
+<text x="12" y="20" class="diagram-small">FLAPPING-WING MICRO ROBOT</text>
+<rect x="133" y="85" width="74" height="43" rx="12" class="diagram-dark"/>
+<circle cx="170" cy="106" r="14" class="diagram-part"/>
+<path d="M150 95 Q104 37 61 69 Q91 101 150 103 Z M190 95 Q236 37 279 69 Q249 101 190 103 Z" class="diagram-part"/>
+<path d="M150 114 Q111 139 88 163 Q124 158 158 123 Z M190 114 Q229 139 252 163 Q216 158 182 123 Z" class="diagram-dark"/>
+<rect x="151" y="157" width="38" height="22" rx="4" class="diagram-dark"/>
+<text x="197" y="174" class="diagram-label">Battery</text>
+<text x="12" y="55" class="diagram-label">Flexible wings</text>
+<text x="213" y="47" class="diagram-label">Wing motion</text>
+<text x="12" y="207" class="diagram-small">MOTOR → LINKAGE → WING STROKES</text></svg>`
+},
+fly:{
+caption:'Flying robots use motion sensors to detect rotation. A controller processes sensor readings and adjusts motors to stabilise flight.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Flight stabilisation control diagram">
+<text x="12" y="20" class="diagram-small">FLIGHT STABILISATION LOOP</text>
+<rect x="12" y="65" width="88" height="53" rx="7" class="diagram-dark"/>
+<text x="29" y="86" class="diagram-label">Motion</text><text x="29" y="100" class="diagram-label">sensor</text>
+<rect x="126" y="65" width="88" height="53" rx="7" class="diagram-dark"/>
+<text x="141" y="86" class="diagram-label">Controller</text><text x="143" y="100" class="diagram-label">computer</text>
+<rect x="240" y="65" width="88" height="53" rx="7" class="diagram-dark"/>
+<text x="257" y="86" class="diagram-label">Motors</text><text x="255" y="100" class="diagram-label">and wings</text>
+<path d="M100 91 L124 91 M214 91 L238 91 M284 120 L284 154 L55 154 L55 120" class="diagram-line"/>
+<text x="102" y="174" class="diagram-label">Feedback corrects movement</text>
+<text x="12" y="207" class="diagram-small">SENSE → COMPUTE → ADJUST → REPEAT</text></svg>`
+},
+grasshopper:{
+caption:'A jumping robot can store energy in a spring and release it quickly. Its legs push against the ground to launch the body.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Spring powered jumping robot diagram">
+<text x="12" y="20" class="diagram-small">SPRING-POWERED JUMPING ROBOT</text>
+<rect x="128" y="58" width="80" height="38" rx="10" class="diagram-dark"/>
+<circle cx="168" cy="77" r="10" class="diagram-part"/>
+<path d="M145 96 L112 131 L91 158 M191 96 L224 131 L245 158 M112 131 L125 138 L113 145 L126 152 L91 158 M224 131 L211 138 L223 145 L210 152 L245 158" class="diagram-line"/>
+<path d="M76 166 L265 166" stroke="#91a199" stroke-width="2"/>
+<path d="M171 58 L171 34" class="diagram-line"/>
+<text x="188" y="40" class="diagram-label">Launch</text>
+<text x="12" y="112" class="diagram-label">Leg spring</text>
+<text x="12" y="207" class="diagram-small">STORE ENERGY → RELEASE → JUMP</text></svg>`
+},
+ant:{
+caption:'A six-legged robot coordinates its legs to keep its body supported. Sensors help it choose footholds and navigate uneven surfaces.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Six legged walking robot diagram">
+<text x="12" y="20" class="diagram-small">SIX-LEGGED WALKING ROBOT</text>
+<ellipse cx="170" cy="100" rx="45" ry="25" class="diagram-dark"/>
+<circle cx="215" cy="100" r="17" class="diagram-part"/>
+<path d="M140 111 L113 140 L92 151 M155 120 L145 153 L126 169 M181 120 L193 153 L211 169 M200 111 L230 140 L250 151 M140 91 L112 67 L91 61 M181 82 L196 58 L217 52" class="diagram-line"/>
+<circle cx="92" cy="151" r="4" fill="#b9f36b"/><circle cx="126" cy="169" r="4" fill="#b9f36b"/><circle cx="211" cy="169" r="4" fill="#b9f36b"/><circle cx="250" cy="151" r="4" fill="#b9f36b"/>
+<text x="228" y="139" class="diagram-label">Foot contact</text>
+<path d="M60 184 L280 184" stroke="#91a199" stroke-width="2"/>
+<text x="12" y="207" class="diagram-small">JOINTS + LEGS + FOOT SENSING</text></svg>`
+},
+cockroach:{
+caption:'A rugged robot can use multiple articulated legs and obstacle sensors to travel over rough ground while maintaining support.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Rough terrain walking robot diagram">
+<text x="12" y="20" class="diagram-small">ROUGH-TERRAIN ROBOT</text>
+<path d="M12 171 L65 171 L85 155 L125 171 L164 151 L206 171 L251 159 L286 171 L328 171" stroke="#91a199" stroke-width="2" fill="none"/>
+<rect x="115" y="76" width="110" height="42" rx="12" class="diagram-dark"/>
+<circle cx="225" cy="96" r="12" class="diagram-part"/>
+<path d="M135 117 L106 143 L85 154 M157 118 L148 154 L132 170 M190 118 L205 148 L223 165 M211 115 L248 138 L266 157" class="diagram-line"/>
+<text x="12" y="48" class="diagram-label">Obstacle sensor</text><path d="M78 54 L107 79" class="diagram-line"/>
+<text x="236" y="77" class="diagram-label">Controller</text>
+<text x="12" y="207" class="diagram-small">SENSE TERRAIN → PLACE FEET → MOVE</text></svg>`
+},
+beetle:{
+caption:'A protective outer shell can shield delicate components. A deployable mechanism can open when a robot needs to extend wings or tools.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Protective shell and deployable wing diagram">
+<text x="12" y="20" class="diagram-small">PROTECTIVE SHELL MECHANISM</text>
+<path d="M72 85 Q170 35 268 85 L245 133 Q170 157 95 133 Z" class="diagram-dark"/>
+<path d="M170 60 L170 137" class="diagram-line"/>
+<path d="M170 82 Q116 24 81 46 Q104 83 166 103 Z M170 82 Q224 24 259 46 Q236 83 174 103 Z" class="diagram-part"/>
+<path d="M80 148 L118 129 M260 148 L222 129" class="diagram-line"/>
+<text x="12" y="160" class="diagram-label">Protective cover</text><text x="224" y="160" class="diagram-label">Deployable wings</text>
+<text x="12" y="207" class="diagram-small">COVER CLOSED → OPEN → DEPLOY</text></svg>`
+},
+mantis:{
+caption:'A robotic gripper uses linked segments and joints to open, close and hold an object. Grip force must hold the object without damaging it.',
+svg:`<svg viewBox="0 0 340 220" role="img" aria-label="Robotic gripper inspired by praying mantis forelegs">
+<text x="12" y="20" class="diagram-small">ARTICULATED ROBOTIC GRIPPER</text>
+<rect x="26" y="82" width="64" height="48" rx="8" class="diagram-dark"/>
+<circle cx="90" cy="106" r="9" class="diagram-part"/>
+<path d="M90 106 L145 75 L195 96 M195 96 L230 69 L246 80 M195 96 L230 126 L246 116" stroke="#b9f36b" stroke-width="6" stroke-linecap="round" fill="none"/>
+<circle cx="145" cy="75" r="8" class="diagram-part"/><circle cx="195" cy="96" r="8" class="diagram-part"/>
+<circle cx="250" cy="98" r="17" class="diagram-dark"/>
+<path d="M245 82 L258 65 M245 114 L258 131" class="diagram-line"/>
+<text x="12" y="66" class="diagram-label">Actuator</text><text x="125" y="52" class="diagram-label">Joint</text><text x="263" y="102" class="diagram-label">Object</text>
+<text x="12" y="207" class="diagram-small">ACTUATOR → LINKAGES → GRIP</text></svg>`
+}
+};
+
+const grid=document.getElementById('grid');
+const library=document.getElementById('library');
+const study=document.getElementById('study');
+const hero=document.getElementById('hero');
+const viewer=document.getElementById('insect3D');
+const modelStatus=document.getElementById('modelStatus');
+
+function renderCards(){
+ const query=document.getElementById('search').value.trim().toLowerCase();
+ const category=document.getElementById('filter').value;
+ const filtered=insects.filter(insect=>{
+  const matchesCategory=category==='All'||insect.category===category;
+  const text=[insect.name,insect.scientific,insect.concept,insect.anatomy,insect.physics,insect.mechanics,insect.robotics].join(' ').toLowerCase();
+  return matchesCategory&&text.includes(query);
+ });
+ grid.innerHTML=filtered.map(insect=>`
+  <article class="card" data-id="${insect.id}" tabindex="0" role="button" aria-label="Explore ${insect.name}">
+   <div class="art"><img src="${insect.image}" alt="${insect.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${insect.emoji}'"></div>
+   <div class="details"><span class="category">${insect.category}</span><h3>${insect.name}</h3><div class="scientific">${insect.scientific}</div><p class="concept">${insect.concept}</p><div class="open">EXPLORE SPECIMEN ↗</div></div>
+  </article>`).join('');
+ if(!filtered.length)grid.innerHTML='<p>No insects found. Try another search.</p>';
+}
+
+function selectTab(name){
+ document.querySelectorAll('.study-tab').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===name)));
+ document.querySelectorAll('.module-panel').forEach(panel=>panel.classList.toggle('active',panel.id==='panel-'+name));
+}
+
+document.querySelectorAll('.study-tab').forEach(button=>button.addEventListener('click',()=>selectTab(button.dataset.tab)));
+
+function renderRoboticsVisual(insect){
+ const diagram=diagrams[insect.id]||diagrams.ant;
+ document.getElementById('robotVisual').innerHTML=diagram.svg;
+ document.getElementById('robotVisualCaption').textContent=diagram.caption;
+}
+
+
+function renderResources(insect){
+ const q = encodeURIComponent(insect.name);
+ const concepts = {
+  anatomy: [
+   {label:'Smithsonian — What is an insect?',url:'https://naturalhistory.si.edu/education/teaching-resources/life-science/what-insect'},
+   {label:'Species anatomy and morphology papers',url:'https://europepmc.org/search?query='+encodeURIComponent(insect.name+' anatomy morphology')}
+  ],
+  physics: [
+   {label:'OpenStax — free science textbooks',url:'https://openstax.org/subjects/science'},
+   {label:'Research on '+insect.name+' physics and biomechanics',url:'https://europepmc.org/search?query='+encodeURIComponent(insect.name+' biomechanics physics')}
+  ],
+  mechanics: [
+   {label:'Research on '+insect.name+' movement and mechanics',url:'https://europepmc.org/search?query='+encodeURIComponent(insect.name+' locomotion mechanics movement')},
+   {label:'arXiv — engineering and mechanics papers',url:'https://arxiv.org/search/?query='+encodeURIComponent(insect.name+' biomechanics')+'&searchtype=all'}
+  ],
+  robotics: [
+   {label:'Bio-inspired robotics research on '+insect.name,url:'https://arxiv.org/search/?query='+encodeURIComponent(insect.name+' bio-inspired robotics')+'&searchtype=all'},
+   {label:'Europe PMC — insect-inspired robotics research',url:'https://europepmc.org/search?query='+encodeURIComponent(insect.name+' bioinspired robotics')}
+  ]
+ };
+ Object.entries(concepts).forEach(([topic,items])=>{
+  const container=document.getElementById('resources-'+topic);
+  if(!container)return;
+  container.innerHTML=items.map(item=>`<a class="resource-link" href="${item.url}" target="_blank" rel="noopener noreferrer">${item.label}<span>OPEN ↗</span></a>`).join('');
+ });
+}
+
+function renderStudy(insect){
+ const lesson=lessons[insect.id];
+ selectTab('anatomy');
+
+ document.getElementById('anatomyOverview').textContent=insect.anatomy;
+ document.getElementById('physicsOverview').textContent=insect.physics;
+ document.getElementById('mechanicsOverview').textContent=insect.mechanics;
+ document.getElementById('roboticsOverview').textContent=insect.robotics;
+
+ const partButtons=document.getElementById('partButtons');
+ partButtons.innerHTML=lesson.parts.map((part,i)=>`<button class="part-button${i===0?' active':''}" type="button" data-part="${i}">${part[0]}</button>`).join('');
+
+ function showPart(i){
+  document.getElementById('partType').textContent='BODY PART '+String(i+1).padStart(2,'0');
+  document.getElementById('partName').textContent=lesson.parts[i][0];
+  document.getElementById('partDescription').textContent=lesson.parts[i][1];
+  partButtons.querySelectorAll('button').forEach((button,j)=>button.classList.toggle('active',i===j));
+ }
+ partButtons.onclick=e=>{const button=e.target.closest('[data-part]');if(button)showPart(Number(button.dataset.part));};
+ showPart(0);
+
+ document.getElementById('physicsKey').textContent=lesson.key;
+ document.getElementById('physicsExplain').textContent=lesson.explain;
+ document.getElementById('physicsObserve').textContent=lesson.observe;
+ document.getElementById('experimentPrompt').textContent=lesson.prompt;
+ document.getElementById('physicsSliderLabel').textContent=lesson.label;
+
+ const slider=document.getElementById('physicsSlider');
+ function updatePhysics(){
+  const value=Number(slider.value);
+  document.getElementById('physicsValue').textContent=value+' / 10';
+  document.getElementById('experimentResult').textContent=lesson.result(value);
+ }
+ slider.value=5;
+ slider.oninput=updatePhysics;
+ updatePhysics();
+
+ const stepButtons=document.getElementById('stepButtons');
+ stepButtons.innerHTML=lesson.steps.map((step,i)=>`<button class="step-button${i===0?' active':''}" type="button" data-step="${i}">${i+1}. ${step[0]}</button>`).join('');
+
+ function showStep(i){
+  document.getElementById('stepCounter').textContent='MOVEMENT STEP '+(i+1)+' OF '+lesson.steps.length;
+  document.getElementById('stepName').textContent=lesson.steps[i][0];
+  document.getElementById('stepDescription').textContent=lesson.steps[i][1];
+  stepButtons.querySelectorAll('button').forEach((button,j)=>button.classList.toggle('active',i===j));
+ }
+ stepButtons.onclick=e=>{const button=e.target.closest('[data-step]');if(button)showStep(Number(button.dataset.step));};
+ showStep(0);
+
+ document.getElementById('robotIdea').textContent=lesson.idea;
+ document.getElementById('robotIdeaDescription').textContent=lesson.ideaText;
+ document.getElementById('robotChallenge').textContent=lesson.challenge;
+
+ renderRoboticsVisual(insect);
+ renderResources(insect);
+}
+
+function openStudy(id){
+ const insect=insects.find(item=>item.id===id);
+ if(!insect)return;
+ document.getElementById('name').textContent=insect.name;
+ document.getElementById('scientific').textContent=insect.scientific;
+ document.getElementById('category').textContent='SPECIMEN / '+insect.category;
+
+ renderStudy(insect);
+ modelStatus.textContent='Loading 3D model...';
+ viewer.removeAttribute('src');
+ viewer.setAttribute('src',insect.model);
+ viewer.setAttribute('alt','Interactive 3D model of '+insect.name);
+
+ library.style.display='none';
+ hero.style.display='none';
+ study.style.display='block';
+ window.scrollTo(0,0);
+}
+
+viewer.addEventListener('load',()=>modelStatus.textContent='Model loaded. Drag to rotate and scroll to zoom.');
+viewer.addEventListener('error',()=>modelStatus.textContent='Could not load this model. Check the filename in your models folder.');
+
+grid.addEventListener('click',event=>{
+ const card=event.target.closest('.card');
+ if(card)openStudy(card.dataset.id);
+});
+
+grid.addEventListener('keydown',event=>{
+ const card=event.target.closest('.card');
+ if(card&&(event.key==='Enter'||event.key===' ')){
+  event.preventDefault();
+  openStudy(card.dataset.id);
+ }
+});
+
+document.getElementById('back').addEventListener('click',()=>{
+ study.style.display='none';
+ library.style.display='block';
+ hero.style.display='block';
+ viewer.removeAttribute('src');
+ window.scrollTo(0,0);
+});
+
+document.getElementById('resetView').addEventListener('click',()=>{
+ viewer.cameraOrbit='auto auto auto';
+ viewer.cameraTarget='auto auto auto';
+ viewer.fieldOfView='auto';
+});
+
+document.getElementById('search').addEventListener('input',renderCards);
+document.getElementById('filter').addEventListener('change',renderCards);
+
+renderCards();
+</script>
+</body>
+</html>
